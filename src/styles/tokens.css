@@ -1,0 +1,89 @@
+/*
+  DESIGN TOKENS
+  =============
+  Every color, font, spacing, and radius value used anywhere in the app
+  should come from here. Nothing below this file should ever contain a
+  raw hex code or a magic pixel number.
+
+  Why this matters: when the product manager says "make the loss color
+  less aggressive," you edit ONE line here instead of hunting through
+  every component file.
+*/
+
+:root {
+  /* ---- Surface & background ----
+     Dark, slightly desaturated navy rather than pure black — pure black
+     against white text causes harsh contrast (halation) that's fatiguing
+     to stare at for hours, which is exactly what a trading app asks of people. */
+  --color-bg: #0A0D12;
+  --color-surface: #12151C;
+  --color-surface-hover: #171C26;
+  --color-border: #232838;
+  --color-border-subtle: #1A1E29;
+
+  /* ---- Text ---- */
+  --color-text-primary: #EDEFF3;
+  --color-text-secondary: #8D94A6;
+  --color-text-tertiary: #565D6D;
+
+  /* ---- Accent ----
+     Used for interactive, non-financial UI (watchlist star, links, focus
+     rings). Deliberately NOT green or red, so it never gets confused with
+     a gain/loss signal. Warm amber against the cool navy background. */
+  --color-accent: #E8A33D;
+  --color-accent-bg: rgba(232, 163, 61, 0.12);
+
+  /* ---- Gain / loss ----
+     These are the only two colors in the whole app that carry financial
+     meaning. Every component that shows a price change reads from these
+     two variables and NEVER hardcodes green/red directly. */
+  --color-positive: #2FCB7A;
+  --color-positive-bg: rgba(47, 203, 122, 0.12);
+  --color-negative: #F0563F;
+  --color-negative-bg: rgba(240, 86, 63, 0.12);
+
+  /* ---- Typography ----
+     Two font roles: a UI face for labels/names, and a monospace face
+     for anything numeric. Monospace matters here — with tabular figures,
+     digits line up in a column when prices update, so numbers don't
+     visually "jitter" as they change. */
+  --font-ui: 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-mono: 'IBM Plex Mono', 'SFMono-Regular', Consolas, monospace;
+
+  --text-xs: 0.75rem;    /* 12px */
+  --text-sm: 0.8125rem;  /* 13px */
+  --text-base: 0.9375rem;/* 15px */
+  --text-lg: 1.125rem;   /* 18px */
+  --text-xl: 1.5rem;     /* 24px */
+  --text-2xl: 1.875rem;  /* 30px */
+
+  /* ---- Spacing scale ----
+     A fixed set of steps instead of arbitrary values, so every gap/padding
+     in the app is visually related to every other one. */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+
+  /* ---- Radius & shadow ---- */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+
+  --shadow-card: 0 1px 2px rgba(0,0,0,0.4), 0 8px 24px -12px rgba(0,0,0,0.5);
+  --shadow-card-hover: 0 2px 4px rgba(0,0,0,0.4), 0 16px 32px -14px rgba(0,0,0,0.6);
+
+  /* ---- Motion ---- */
+  --transition-base: 160ms ease;
+}
+
+/* Respect people who've told their OS they don't want motion */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}

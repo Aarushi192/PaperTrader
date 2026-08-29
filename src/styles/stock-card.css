@@ -1,0 +1,185 @@
+/*
+  STOCK CARD
+  ==========
+  Markup contract this CSS expects:
+
+  <article class="stock-card" data-trend="positive | negative | neutral">
+    <button class="stock-card__watchlist-btn" aria-pressed="false">...svg...</button>
+    <div class="stock-card__header">
+      <span class="stock-card__symbol">AAPL</span>
+      <span class="stock-card__name">Apple Inc.</span>
+    </div>
+    <div class="stock-card__price">$187.42</div>
+    <div class="stock-card__change stock-card__change--positive">...</div>
+    <div class="stock-card__sparkline"></div>
+  </article>
+
+  Naming follows BEM (Block__Element--Modifier). It reads verbosely, but
+  the payoff is that ".stock-card__price" can NEVER be accidentally
+  overridden by some unrelated ".price" class elsewhere in the app —
+  every class is namespaced to this component.
+*/
+
+.stock-card {
+  /* data-trend below sets --trend-color; if it's ever missing, fall back
+     to a neutral border color so the card never renders broken. */
+  --trend-color: var(--color-border);
+
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  min-width: 0; /* lets long text truncate instead of blowing out the grid */
+
+  padding: var(--space-5);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-left: 3px solid var(--trend-color);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+
+  transition: transform var(--transition-base), box-shadow var(--transition-base),
+              border-color var(--transition-base);
+}
+
+.stock-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-card-hover);
+}
+
+/* This is the whole trick: three tiny rules, and every visual element
+   inside the card (accent stripe, badge text, badge background) reads
+   from --trend-color / the shared positive/negative tokens. Add a new
+   trend state later (e.g. "halted") by adding one more rule here. */
+.stock-card[data-trend="positive"] { --trend-color: var(--color-positive); }
+.stock-card[data-trend="negative"] { --trend-color: var(--color-negative); }
+.stock-card[data-trend="neutral"]  { --trend-color: var(--color-border); }
+
+/* ---- Header: symbol + name ---- */
+.stock-card__header {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding-right: var(--space-6); /* clears the watchlist button */
+}
+
+.stock-card__symbol {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: var(--text-lg);
+  letter-spacing: 0.02em;
+  color: var(--color-text-primary);
+}
+
+.stock-card__name {
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  /* Long company names truncate cleanly instead of wrapping and
+     breaking the card's fixed rhythm — this is the fix for the
+     "long company name" stress test. */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ---- Price ---- */
+.stock-card__price {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums; /* digits occupy equal width */
+  font-size: var(--text-2xl);
+  font-weight: 700;
+  line-height: 1;
+  color: var(--color-text-primary);
+  /* long prices (e.g. Berkshire-style $612,450.00) shrink slightly
+     rather than overflow the card */
+  overflow-wrap: anywhere;
+}
+
+/* ---- Change badge ---- */
+.stock-card__change {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  align-self: flex-start;
+  padding: 3px 9px;
+  border-radius: 999px;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  font-weight: 600;
+}
+
+.stock-card__change svg {
+  width: 9px;
+  height: 9px;
+  flex-shrink: 0;
+}
+
+.stock-card__change--positive {
+  color: var(--color-positive);
+  background: var(--color-positive-bg);
+}
+.stock-card__change--positive svg { transform: rotate(0deg); }
+
+.stock-card__change--negative {
+  color: var(--color-negative);
+  background: var(--color-negative-bg);
+}
+.stock-card__change--negative svg { transform: rotate(180deg); }
+
+.stock-card__change--neutral {
+  color: var(--color-text-secondary);
+  background: rgba(141, 148, 166, 0.12);
+}
+
+/* ---- Sparkline placeholder ----
+   Intentionally empty. Just a bordered box that reserves the exact
+   space the real chart will occupy later, so swapping it in won't
+   reflow the card layout. */
+.stock-card__sparkline {
+  height: 48px;
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius-sm);
+}
+
+/* ---- Watchlist button ---- */
+.stock-card__watchlist-btn {
+  position: absolute;
+  top: var(--space-4);
+  right: var(--space-4);
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  color: var(--color-text-tertiary);
+  transition: color var(--transition-base), background var(--transition-base),
+              border-color var(--transition-base);
+}
+
+.stock-card__watchlist-btn svg {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.75;
+}
+
+.stock-card__watchlist-btn:hover {
+  color: var(--color-accent);
+  background: var(--color-accent-bg);
+  border-color: rgba(232, 163, 61, 0.3);
+}
+
+/* aria-pressed="true" = already on the watchlist -> filled star.
+   Styling off the ARIA state (instead of a separate .is-active class)
+   means the visual state can never drift out of sync with what a
+   screen reader announces. */
+.stock-card__watchlist-btn[aria-pressed="true"] {
+  color: var(--color-accent);
+}
+.stock-card__watchlist-btn[aria-pressed="true"] svg {
+  fill: var(--color-accent);
+}
